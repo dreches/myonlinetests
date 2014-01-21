@@ -15,10 +15,10 @@
     .ui-tabs-vertical { width: 55em; }
     .ui-tabs-vertical .ui-tabs-nav { padding: 0em .3em 0em 0em; float: right;
 									 margin-right: 0em;
-									 width: 12em; border: 1px solid purple !important;}
+									 width: 14em; }
     .ui-tabs-vertical .ui-tabs-nav li { clear: right; 
 										width: 100%;
-										
+										font-size: 95%;
 										border: groove grey;
 										border-width: 2px 4px 2px 0px !important ;
 										border-width-left: 0px !important;
@@ -31,11 +31,21 @@
 													   border-width: 1px;
 													   border-left-width: 0px; 								   
 													   border: groove grey;}
-    .ui-tabs-vertical .ui-tabs-panel { padding: 1em; float: right; width: 40em; border: 1px solid red;}
+    .ui-tabs-vertical .ui-tabs-panel { padding: 1em; 
+										
+									   float: left; 
+									   width: 40em; 
+									   border: 1px solid red;}
 	section {border : 1px solid orange; padding: 0px;}
-	div[id^="tab-"]{ background-color: #EBFFD6 !important; padding-right: 0px; margin-right: 0px;}
-	div[id^="tab-"] form { border: 3px solid green; }
+	#tab-questions .ui-tabs-nav li.ui-tabs-active {background-color: #EBFFD6}
+	div[id^="tab-questions"]{ background-color: #EBFFD6 !important; 
+							  padding-left: 0px; 
+							  padding-right: 0px; 
+							  margin-right: 0px;}
+	div[id^="tab-"] form { border: 1px solid green; }
 	#tab-questions { border:1px solid magenta; padding-right: 0px; width: 100%;}
+	#tab-questions li .ui-icon-close { float: left; margin: 0.4em 0.2em 0 0; cursor: pointer; }
+	
 </style>
 
 
@@ -107,7 +117,7 @@
 					<?php } ?>
 				</ul>
 				<?php if ($editable) {?>
-					<div id="tab-question-new" class="question">
+					<div id="tab-question-new" >
 						<fieldset>
 							<legend>Add Question</legend>
 							<p class="form-row">

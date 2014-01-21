@@ -125,7 +125,7 @@
                     case 1://A check box list, a textbox, and a delete control for edit and a DIV for take
                         switch (this.options.display_mode) {
                             case "edit":
-                                var delete_control = this.options.disabled ? "" : " - <a href='#' class='alerttext' id='" + delete_control_id + "' answer_id='" + answer_id + "' " + this.disabled_option + ">delete</a><br/>";
+                                var delete_control = this.options.disabled ? "" : " - <a href='#' class='alerttext button' id='" + delete_control_id + "' answer_id='" + answer_id + "' " + this.disabled_option + ">delete</a><br/>";
                                 this.element.append("<span style='float:left' class='form-row' class='form-row' id='" + answer_span_id + "'>"
                                  + "<input style='float:left' type='checkbox' id='" + select_control_id + "' name='" + select_control_id + "' " + answer_select + " answer_id='" + answer_id + "' textbox_control_id='" + textbox_control_id + "' " + this.disabled_option + "/> "
                                  + "<input type='text' id='" + textbox_control_id + "' value='" + answer_text + "' " + this.disabled_option + "/>"
@@ -149,7 +149,7 @@
                     case 2://a radio button list
                         switch (this.options.display_mode){
                             case "edit":
-                                var delete_control = this.options.disabled ? "" : " - <a href='#' class='alerttext' id='" + delete_control_id + "' answer_id='" + answer_id + "' " + this.disabled_option + ">delete</a><br/>";
+                                var delete_control = this.options.disabled ? "" : " - <a href='#' class='alerttext button' id='" + delete_control_id + "' answer_id='" + answer_id + "' " + this.disabled_option + ">delete</a><br/>";
                                 this.element.append("<span class='form-row' style='float:left' id='" + answer_span_id + "'>"
                                 + "<input style='float:left'  type='radio' id='" + select_control_id + "' " + answer_select + " answer_id='" + answer_id + "' textbox_control_id='" + textbox_control_id + "' name='" + rdo_control_name + "' value='" + answer_id + "' " + this.disabled_option + "/> "
                                 + "<input type='text' id='" + textbox_control_id + "' value='" + answer_text + "' " + this.disabled_option + "/>"

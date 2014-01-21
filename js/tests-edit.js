@@ -21,11 +21,12 @@
 			li = $( tabTemplate.replace( /#\{href\}/g, "#" + id ).replace( /#\{label\}/g, label ) );
 			//tabContentHtml = tabContent.val() || "Tab " + tabCounter + " content.";
 
-
+			tabs.find( ".ui-tabs-nav" ).append( li ).removeClass("ui-corner-top").addClass("ui-corner-right");
 			tabs.append( "<div style='display: none' id='" + id + "' class = 'question' question_id='" + question_id + "'></div>" );
 			tabs.tabs( "refresh" );
-			tabs.find( ".ui-tabs-nav" ).append( li ).removeClass("ui-corner-top").addClass("ui-corner-right");
-			tabCounter++;
+
+
+			//tabCounter++;
     	};
 
 
@@ -93,6 +94,8 @@
                 return;
             }
 
+            // If question text not unique
+
             $.ajax({
                 type: "POST",
                 url: "/questions/p_create/" + test_id,
@@ -105,6 +108,7 @@
             });
 
             if (question_id != null) {
+				 $('#question_text').val("");//blank out the question so doesn't get readded by mistake
                 //Add the question to the local page
 
                 /*
@@ -120,8 +124,11 @@
                 addTab(question_text.trunc(15, true),question_id);
                 $( "#tab-question-" + question_id).question({question_text: question_text, question_type_id: question_type_id, question_id: question_id});
             }
+            else {
+				// Give an error message indicating question was not added
+				alert ("Unable to add question.");
+			}
 
-            $('#question_text').val("");//blank out the question
         });
 
 
