@@ -1,0 +1,120 @@
+﻿/*
+Original design: Basic Minimal (v1.0 - Mar 02, 2011) - A free xhtml/css website template by Andreas Viklund.
+For more information, see http://andreasviklund.com/templates/basic-minimal/
+*/
+
+@font-face {
+	font-family: 'DesignationRegular';
+	src: url('designation-webfont.eot');
+	font-weight: normal;
+	font-style: normal;
+}
+
+body {color:#555; font:84% Tahoma,Verdana,sans-serif; line-height:1.6em;}
+p {margin:0 0 20px 0;}
+p.slogan {font-size:1.4em;padding:15px 0 15px 40px;}
+a {color:#467aa7; text-decoration:none;}
+a:hover {color:#333; text-decoration:none;}
+p.slogan,h1,h2,h3,#sidebar li a {font-family:'DesignationRegular', Tahoma, sans-serif; letter-spacing:-1px; font-weight:400; text-shadow:1px 1px 4px #bbb;}
+h1 {font-size:4em; padding:30px 0 0 0; margin:0;}
+h2 {font-size:2.4em; margin:0 0 20px 0;}
+h3 {font-size:1.8em;}
+img.alignleft {display:inline; float:left; margin:5px 25px 5px 0;}
+img.alignright {float:right; margin:5px 0 5px 25px;}
+img.aligncenter {display:block; margin:10px auto;}
+hr.clear {visibility:hidden;clear:both;}
+label { display: block; float: left; width: 120px; text-align: right; margin-right: 5px; }
+label.error { width: 250px; display: block; float: left; color: red; padding-left: 10px; }
+input[type=text], textarea { width: 300px; float: left; }
+
+#wrap {width:980px; margin:20px auto; padding:0;}
+#header {width:680px; margin:0 0 30px 20px; height:120px; padding-left:200px; background:transparent url(images/logo.jpg) top left no-repeat;}
+#content {width:460px; margin-left:220px;}
+#content .meta {padding:10px; text-align:right; text-transform:uppercase; font-size:0.8em; line-height:1.4em;}
+
+#sidebar {padding:0; float:left; width:200px;}
+#sidebar ul {margin:0 0 20px 0; padding:0;}
+#sidebar li {list-style:none; padding:0; margin:0;}    
+#sidebar li a {display:block; padding:10px 20px; text-decoration:none; font-family:'DesignationRegular', Tahoma, sans-serif; font-size:1.4em;}
+#sidebar li a.current {color:#333;}
+#sidebar li a:hover {color:#333;}
+#sidebar h2 {font-size:1.8em; margin:0 0 12px 0; padding:0 0 3px 0;}
+
+footer
+{
+    clear: both;
+    background: eee;
+    color: black;
+    padding: 0;
+    text-align: center;
+    vertical-align: middle;
+    line-height: normal;
+    margin: 0;
+    position: fixed;
+    bottom: 20px;
+    width:900px;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:3em
+}
+
+.alerttext {color: #ff0000; font-weight: bold;}
+.postframe {color: black;border: 1px ;border-style: solid;border-color: #000000; width: 300px;padding: 5px ;margin: 3px}
+.question_text {color:black; font-weight: bold}
+.table-header td {font-weight: bold;padding: 1px;}
+.table-row td {border:1px solid #C0C0C0}
+.form-row { padding: 5px 0; clear: both; width: 700px;}
+
+/** thanks to http://coding.smashingmagazine.com/2008/08/13/top-10-css-table-designs/ for the following styles **/
+#rounded-corner
+{
+    font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+    font-size: 12px;
+    margin: 45px;
+    width: 480px;
+    text-align: left;
+    border-collapse: collapse;
+}
+#rounded-corner thead th.rounded-q1
+{
+    background: #b9c9fe url('/images/left.png') left -1px no-repeat;
+}
+#rounded-corner thead th.rounded-q4
+{
+    background: #b9c9fe url('/images/right.png') right -1px no-repeat;
+}
+#rounded-corner th
+{
+    padding: 8px;
+    font-weight: normal;
+    font-size: 13px;
+    color: #039;
+    background: #b9c9fe;
+}
+#rounded-corner td
+{
+    padding: 8px;
+    background: #e8edff;
+    border-top: 1px solid #fff;
+    color: #669;
+}
+#rounded-corner tfoot td.rounded-foot-left
+{
+    background: #e8edff url('/images/botleft.png') left bottom no-repeat;
+}
+#rounded-corner tfoot td.rounded-foot-right
+{
+    background: #e8edff url('/images/botright.png') right bottom no-repeat;
+}
+#rounded-corner tbody tr:hover td
+{
+    background: #d0dafd;
+}
+
+#loading {
+    background:url("/images/ajax_loading.gif") no-repeat center;
+    height: 100px; width: 100px;
+    position: fixed; left: 50%; top: 25%; z-index: 1;
+    margin: -25px 0 0 -25px;
+}
+
