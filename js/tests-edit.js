@@ -21,11 +21,13 @@
 			li = $( tabTemplate.replace( /#\{href\}/g, "#" + id ).replace( /#\{label\}/g, label ) );
 			//tabContentHtml = tabContent.val() || "Tab " + tabCounter + " content.";
 
-			tabs.find( ".ui-tabs-nav" ).append( li ).removeClass("ui-corner-top").addClass("ui-corner-right");
+			tabs.find( ".ui-tabs-nav" ).append( li );
 			tabs.append( "<div style='display: none' id='" + id + "' class = 'question' question_id='" + question_id + "'></div>" );
+
+
 			tabs.tabs( "refresh" );
-
-
+			newTab = tabs.find("[aria-controls="+id+"]").removeClass( "ui-corner-top" ).addClass( "ui-corner-right" );
+			return newTab;
 			//tabCounter++;
     	};
 
@@ -120,9 +122,11 @@
                 var newTab = $( "#tab-questions .ui-tabs-nav").append("<li><a href='#tab-question-" + question_id + "'>" + question_text.trunc(15, true) + "</li>");
                 $("#tab-questions").tabs("refresh");
                  */
-                //light up the question
-                addTab(question_text.trunc(15, true),question_id);
+
+                var thisTab = addTab(question_text.trunc(15, true),question_id);
                 $( "#tab-question-" + question_id).question({question_text: question_text, question_type_id: question_type_id, question_id: question_id});
+				//display the newly added question
+				tabs.tabs({ active: -1 });
             }
             else {
 				// Give an error message indicating question was not added
