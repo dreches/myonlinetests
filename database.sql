@@ -13,8 +13,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `seankraf_h4_seankraft_fall2013_biz`
 --
-CREATE DATABASE IF NOT EXISTS `seankraf_h4_seankraft_fall2013_biz` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `seankraf_h4_seankraft_fall2013_biz`;
+CREATE DATABASE IF NOT EXISTS `debrexbi_onlinetest_debrex_biz` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `debrexbi_onlinetest_debrex_biz`;
 
 -- --------------------------------------------------------
 
@@ -250,3 +250,9 @@ CREATE TABLE IF NOT EXISTS `users` (
   `person_id` varchar(100) NOT NULL,
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=34 ;
+
+INSERT INTO `question_types` (`question_type_id`, `question_type_descr`) VALUES
+(1, 'Choose all correct answers'),
+(2, 'Choose single correct answer'),
+(3, 'True/False'),
+(4, 'Essay Question');
