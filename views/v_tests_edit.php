@@ -45,7 +45,7 @@
 	div[id^="tab-"] form { border: 1px solid green; }
 	#tab-questions { border:1px solid magenta; padding-right: 0px; width: 100%;}
 	#tab-questions li .ui-icon-close { float: left; margin: 0.4em 0.2em 0 0; cursor: pointer; }
-	
+	#new_question_tab { font-style: italic; }
 </style>
 
 

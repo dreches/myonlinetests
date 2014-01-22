@@ -5,7 +5,7 @@
 		var tabTemplate = "<li><a href='#{href}'>#{label}</a> <span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span></li>";
 
 		 tabs.find( ".ui-tabs-nav" ).sortable({
-
+			 items: "li:not(#new_question_tab)",  // Adding a new question should always be on top
 			 axis: "y",
 			 stop: function() {
 			 	tabs.tabs( "refresh" );
