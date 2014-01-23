@@ -1,5 +1,4 @@
-
-    $(document).ready(function()   {
+	    $(document).ready(function()   {
 		$( "#tabs" ).tabs();
 		var tabs = $( "#tab-questions" ).tabs();
 		var tabTemplate = "<li><a href='#{href}'>#{label}</a> <span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span></li>";
@@ -30,9 +29,6 @@
 			return newTab;
 			//tabCounter++;
     	};
-
-
-
 
 
         Date.prototype.addDays = function(days) {
@@ -155,8 +151,6 @@
                 passing_grade: "Enter a number between 1 and 100"
             }
         });
-
-
 
     });
 
