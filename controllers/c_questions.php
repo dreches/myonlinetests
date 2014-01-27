@@ -164,42 +164,44 @@ class questions_controller extends secure_controller {
             $_POST["question_order"] = $question_order;
 
             $question_id = DB::instance(DB_NAME)->insert('questions', $_POST);
+			// Make sure we were able to file question
+			if ($question_id) {
+				//If the question is true/false add the two possible answers here
+				if ($question_type_id == 3) {
+					//insert the tru
+					$default_questions = array(
+						"answer_text" => "True",
+						"correct" => "1",
+						"answer_order" => "0",
+						"question_id" => $question_id
+					);
+					DB::instance(DB_NAME)->insert("answers", $default_questions);
+					//insert the false
+					$default_questions = array(
+						"answer_text" => "False",
+						"correct" => "0",
+						"answer_order" => "1",
+						"question_id" => $question_id
+					);
+					DB::instance(DB_NAME)->insert("answers", $default_questions);
 
-            //If the question is true/false add the two possible answers here
-            if ($question_type_id == 3) {
-                //insert the tru
-                $default_questions = array(
-                    "answer_text" => "True",
-                    "correct" => "1",
-                    "answer_order" => "0",
-                    "question_id" => $question_id
-                );
-                DB::instance(DB_NAME)->insert("answers", $default_questions);
-                //insert the false
-                $default_questions = array(
-                    "answer_text" => "False",
-                    "correct" => "0",
-                    "answer_order" => "1",
-                    "question_id" => $question_id
-                );
-                DB::instance(DB_NAME)->insert("answers", $default_questions);
+				}
 
-            }
+				//If we have an essay question add one possible answer
+				if ($question_type_id == 4) {
+					//insert the tru
+					$default_questions = array(
+						"answer_text" => "Please fill out the essay question",
+						"correct" => "1",
+						"answer_order" => "0",
+						"question_id" => $question_id
+					);
+					DB::instance(DB_NAME)->insert("answers", $default_questions);
+				}
 
-            //If we have an essay question add one possible answer
-            if ($question_type_id == 4) {
-                //insert the tru
-                $default_questions = array(
-                    "answer_text" => "Please fill out the essay question",
-                    "correct" => "1",
-                    "answer_order" => "0",
-                    "question_id" => $question_id
-                );
-                DB::instance(DB_NAME)->insert("answers", $default_questions);
-            }
-
-            //send back the ID
-            echo json_encode(array($question_id));
+				//send back the ID
+				echo json_encode(array($question_id,$question_order));
+			}
         } else {//there were errors
             echo json_encode(null);
         }

@@ -10,6 +10,7 @@
 	<?php if(isset($client_files_head)) echo $client_files_head; ?>
     <link rel="stylesheet" href="/css/basic-minimal.css" type="text/css"/>
     <link rel="stylesheet" href="/css/jquery-ui.css" type="text/css"/>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css" type=text/css">
     <script type="text/javascript" src="/js/jquery-1.10.2.js"></script>
     <script type="text/javascript" src="/js/jquery-ui.js"></script>
     <script type="text/javascript" src="/js/jquery.ui.core.js"></script>

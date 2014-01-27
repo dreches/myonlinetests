@@ -1,23 +1,28 @@
 	    $(document).ready(function()   {
 		$( "#tabs" ).tabs();
 		var tabs = $( "#tab-questions" ).tabs();
-		var tabTemplate = "<li><a href='#{href}'>#{label}</a> <span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span></li>";
+		var tabTemplate = "<li><span class='question-order'>#{order}.</span>" +
+							"<a href='#{href}'>#{label}</a>" +
+						"<span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span></li>";
 
 		 tabs.find( ".ui-tabs-nav" ).sortable({
 			 items: "li:not(#new_question_tab)",  // Adding a new question should always be on top
 			 axis: "y",
 			 stop: function() {
+				// Add a call to refile the order of all the questions
 			 	tabs.tabs( "refresh" );
 			 }
 		 });
 		 tabs.addClass( "ui-tabs-vertical ui-helper-clearfix" );
 		 tabs.find("[role=tab]").removeClass( "ui-corner-top" ).addClass( "ui-corner-right" );
 
-		 function addTab(tabTitle, question_id) {
+		 function addTab(tabTitle, question_id, question_order) {
 
 			var label = tabTitle || "Question " + question_id,
 			id = "tab-question-" + question_id,
-			li = $( tabTemplate.replace( /#\{href\}/g, "#" + id ).replace( /#\{label\}/g, label ) );
+			li = $( tabTemplate.replace( /#\{href\}/g, "#" + id )
+				.replace( /#\{label\}/g, label )
+					.replace(/#\{order\}/g, question_order ));
 			//tabContentHtml = tabContent.val() || "Tab " + tabCounter + " content.";
 
 			tabs.find( ".ui-tabs-nav" ).append( li );
@@ -30,6 +35,52 @@
 			//tabCounter++;
     	};
 
+    	var deleteQuestion = false;
+
+    	// close icon: removing the tab on click
+		tabs.delegate( "span.ui-icon-close", "click", function() {
+			// Show a dialog box asking if this should be removed
+			var panelId = $( this ).closest( "li" );
+			dialog.dialog( "open" );
+			if (deleteQuestion)  {
+				panelID.remove().attr( "aria-controls" );
+				$( "#" + panelId ).remove();
+				tabs.tabs( "refresh" );
+			}
+		});
+
+		tabs.bind( "keyup", function( event ) {
+			if ( event.altKey && event.keyCode === $.ui.keyCode.BACKSPACE ) {
+				var panelId = tabs.find( ".ui-tabs-active" );
+				dialog.dialog( "open" );
+				if (deleteQuestion){
+					panelID.remove().attr( "aria-controls" );
+					$( "#" + panelId ).remove();
+					tabs.tabs( "refresh" );
+				}
+			}
+		});
+
+
+
+		// modal dialog init: custom buttons and a "close" callback resetting the form inside
+		var dialog = $( "#dialog-confirm" ).dialog({
+			autoOpen: false,
+			modal: true,
+			buttons: {
+				Delete: function() {
+					deleteQuestion = true;
+					console.log( this );
+					$( this ).dialog( "close" );
+				},
+				Cancel: function() {
+					deleteQuestions = false;
+					console.log( this );
+					$( this ).dialog( "close" );
+				}
+			},
+
+    	});
 
         Date.prototype.addDays = function(days) {
             this.setDate(this.getDate() + days);
@@ -81,6 +132,7 @@
             var question_type_id = parseInt($("input[name='question_type_id']:checked").val());
             var test_id = $('#test_id').val();
             var question_id = 0;
+            var question_order = -1;
 
             if (typeof(question_type_id) == "undefined") {
                 alert ("Please choose a question type")
@@ -101,7 +153,8 @@
                 data: { question_text: question_text, question_type_id: question_type_id},
                 async: false,
                 success : function(data) {
-                    question_id = Number(data);
+                    question_id = Number(data[0]);
+                    question_order = Number(data[1]);
                 }
             });
 
@@ -118,8 +171,8 @@
                 var newTab = $( "#tab-questions .ui-tabs-nav").append("<li><a href='#tab-question-" + question_id + "'>" + question_text.trunc(15, true) + "</li>");
                 $("#tab-questions").tabs("refresh");
                  */
-
-                var thisTab = addTab(question_text.trunc(15, true),question_id);
+				// Add 1 to question order because they start at 0
+                var thisTab = addTab(question_text.trunc(20, true),question_id, question_order+1);
                 $( "#tab-question-" + question_id).question({question_text: question_text, question_type_id: question_type_id, question_id: question_id});
 				//display the newly added question
 				tabs.tabs({ active: -1 });

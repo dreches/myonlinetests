@@ -12,40 +12,53 @@
     label {text-transform:capitalize;}
 </style>
 <style>
+    
     .ui-tabs-vertical { width: 55em; }
     .ui-tabs-vertical .ui-tabs-nav { padding: 0em .3em 0em 0em; float: right;
 									 margin-right: 0em;
-									 width: 14em; }
+									 width: 16em; }
     .ui-tabs-vertical .ui-tabs-nav li { clear: right; 
 										width: 100%;
-										font-size: 95%;
+										font-size: 90%;
 										border: groove grey;
 										border-width: 2px 4px 2px 0px !important ;
 										border-width-left: 0px !important;
 										padding-left: 0px; 
 										margin: 2px 0px 2px .1em; }
     .ui-tabs-vertical .ui-tabs-nav li a { display:block; }
-    .ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active { padding-left: 0px; 
+    .ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active { padding-left: 0px;
+													   background-color: #EBFFD6;
 													   margin: 2px 0px 2px -.1em;
 													   padding-right: .1em; 
 													   border-width: 1px;
 													   border-left-width: 0px; 								   
 													   border: groove grey;}
     .ui-tabs-vertical .ui-tabs-panel { padding: 1em; 
-										
+									   background-color: #EBFFD6;
 									   float: left; 
 									   width: 40em; 
 									   border: 1px solid red;}
+	.ui-tabs-vertical {background-color:#EBFFD6;} 
 	section {border : 1px solid orange; padding: 0px;}
-	#tab-questions .ui-tabs-nav li.ui-tabs-active {background-color: #EBFFD6}
-	div[id^="tab-questions"]{ background-color: #EBFFD6 !important; 
-							  padding-left: 0px; 
-							  padding-right: 0px; 
-							  margin-right: 0px;}
+	#tab-questions .ui-tabs-nav li.ui-tabs-active, 
+	#tab-questions .ui-tabs-nav li.ui-tabs-active * {background-color: #EBFFD6 !important}
+	
+	span.question-order {float: left;  margin-top: .5em; color: green; font-weight: bold; }
+	#tab-question-edit {border: 2px dotted cyan; 
+						padding-left: 0px; padding-right: 0px;
+						background-color: #EBFFD6;}
 	div[id^="tab-"] form { border: 1px solid green; }
-	#tab-questions { border:1px solid magenta; padding-right: 0px; width: 100%;}
-	#tab-questions li .ui-icon-close { float: left; margin: 0.4em 0.2em 0 0; cursor: pointer; }
-	#new_question_tab { font-style: italic; }
+	#tab-questions { margin-left: 0px; margin-right: 0px; 
+					border: 1px solid magenta;
+					padding-left: 0px;
+					margin-right: 0px;
+					padding-right: 0px;
+					width: 100%;
+					background-color: #EBFFD6 !important}
+	#tab-questions li .ui-icon-close { float: right; margin: 0.4em 0.2em 0 0; cursor: pointer; }
+	#new_question_tab { font-weight: bold; font-style: italic; }
+	#tab-question-new fieldset { border-width: 0px;}
+	#tab-question-new fieldset legend{ font-weight: bold}
 </style>
 
 
@@ -101,49 +114,54 @@
 				</form>
 			</div>
 			<div id="tab-question-edit">
+				<div id="dialog-confirm" title="Delete the question?">
+					<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>Delete this question from the test?</p>
+				</div>
 				<div id="tab-questions">
-				<ul> <!-- Moved the list up here -->
-				<?php if ($editable) {?>
-				
-					<li id="new_question_tab"><a href="#tab-question-new">Add a new question</a></li>									
-				<?php }?>
-				<!--List the questions
-				<ul > took out ul tag -->
-					<?php foreach($question_list AS $current_question) { ?>
-						<li><a href="#tab-question-<?php echo $current_question["question_id"]; ?>">
-								<?php echo siteutils::Truncate($current_question['question_text'], 20,true);//truncate so the text fits in the tab?>
-							</a>
-						</li>
-					<?php } ?>
-				</ul>
-				<?php if ($editable) {?>
-					<div id="tab-question-new" >
-						<fieldset>
-							<legend>Add Question</legend>
-							<p class="form-row">
-								<label for="question_text">Question Text:</label>
-								<input type='text' name='question_text' id='question_text' style="width:450px" />
-							</p>
-							<?php foreach($question_types AS $current_question_type) {
-								$selected = $current_question_type['question_type_id'] == "1" ? "checked='checked'" : "";//select the first type by default
-								?>
-								<p class="form-row" style="width:400px">
-									<label style="white-space:nowrap;text-align: left;" for="question_type_id_<?php echo $current_question_type['question_type_id']?>"><?php echo $current_question_type['question_type_descr']?></label>
-									<input type="radio" style="float:right;width:200px" <?php echo $selected;?> name="question_type_id" id="question_type_id_<?php echo $current_question_type['question_type_id']?>" value="<?php echo $current_question_type['question_type_id']?>"/>
+					<ul> <!-- Moved the list up here -->
+					<?php if ($editable) {?>
+					
+						<li id="new_question_tab"><a href="#tab-question-new">Add a new question</a></li>									
+					<?php }?>
+					<!--List the questions
+					<ul > took out ul tag -->
+						<?php foreach($question_list AS $current_question) { ?>
+							<li><span class="question-order"><?php echo $current_question["question_order"]+1?>.</span>
+							<a href="#tab-question-<?php echo $current_question["question_id"]; ?>">
+									<?php echo siteutils::Truncate($current_question['question_text'], 20,true);//truncate so the text fits in the tab?>
+								</a>
+								<span class="ui-icon ui-icon-close" role="presentation">Remove Tab</span>
+							</li>
+						<?php } ?>
+					</ul>
+					<?php if ($editable) {?>
+						<div id="tab-question-new" >
+							<fieldset>
+								<legend>Add a new Question</legend>
+								<p class="form-row">
+									<label for="question_text">Question Text:</label>
+									<input type='text' name='question_text' id='question_text' style="width:450px" />
 								</p>
-							<?php } ?>
-							<input type='hidden' name='test_id' id='test_id' value='<?php echo $test_id;?>'/>
-							<input type='button' value='Add Question' id='cmdAddQuestion'>
-						</fieldset>
-					</div>
-				<?php } ?>
-				<?php foreach($question_list AS $current_question) { ?>
-					<div id='tab-question-<?php echo $current_question["question_id"] ?>'
-						 question_id='<?php echo $current_question["question_id"]; ?>'
-						 class='question' >
+								<?php foreach($question_types AS $current_question_type) {
+									$selected = $current_question_type['question_type_id'] == "1" ? "checked='checked'" : "";//select the first type by default
+									?>
+									<p class="form-row" style="width:400px">
+										<label style="white-space:nowrap;text-align: left;" for="question_type_id_<?php echo $current_question_type['question_type_id']?>"><?php echo $current_question_type['question_type_descr']?></label>
+										<input type="radio" style="float:right;width:200px" <?php echo $selected;?> name="question_type_id" id="question_type_id_<?php echo $current_question_type['question_type_id']?>" value="<?php echo $current_question_type['question_type_id']?>"/>
+									</p>
+								<?php } ?>
+								<input type='hidden' name='test_id' id='test_id' value='<?php echo $test_id;?>'/>
+								<input type='button' value='Add Question' id='cmdAddQuestion'>
+							</fieldset>
+						</div>
+					<?php } ?>
+					<?php foreach($question_list AS $current_question) { ?>
+						<div id='tab-question-<?php echo $current_question["question_id"] ?>'
+							 question_id='<?php echo $current_question["question_id"]; ?>'
+							 class='question' >
 
-					</div>
-				<?php } ?>
+						</div>
+					<?php } ?>
 				</div>
 			</div>
 			<div id="tab-assign">
