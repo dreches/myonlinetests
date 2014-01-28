@@ -28,6 +28,7 @@
     .ui-tabs-vertical .ui-tabs-nav li a { display:block; }
     .ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active { padding-left: 0px;
 													   background-color: #EBFFD6;
+													   background-image:  none;
 													   margin: 2px 0px 2px -.1em;
 													   padding-right: .1em; 
 													   border-width: 1px;
