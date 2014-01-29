@@ -478,7 +478,7 @@ class tests_controller extends secure_controller {
     private function setupTestQuestionsForDisplay($template_instance, $test_id) {
         //setup the questions
         $q = "SELECT question_id, question_order, test_id, created_by_user_id, question_text, question_type_id, question_image
-            , created, updated, all_or_none, deleted FROM questions WHERE test_id = ".$test_id;
+            , created, updated, all_or_none, deleted FROM questions WHERE test_id = ".$test_id. " ORDER BY question_order ASC";
 
         $question_list = DB::instance(DB_NAME)->select_rows($q);
 

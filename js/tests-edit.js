@@ -1,16 +1,59 @@
 	    $(document).ready(function()   {
 		$( "#tabs" ).tabs();
 		var tabs = $( "#tab-questions" ).tabs();
-		var tabTemplate = "<li><span class='question-order'>#{order}.</span>" +
+		var tabTemplate = "<li id='#{qid}'><span class='question-order'>#{order}.</span>" +
 							"<a href='#{href}'>#{label}</a>" +
 						"<span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span></li>";
 
 		 tabs.find( ".ui-tabs-nav" ).sortable({
 			 items: "li:not(#new_question_tab)",  // Adding a new question should always be on top
 			 axis: "y",
-			 stop: function() {
-				// Add a call to refile the order of all the questions
-			 	tabs.tabs( "refresh" );
+			 stop: function( event, ui) {
+
+				 // Determine where the question moved. Question order starts at 0 in the database, but the
+				 // tab display starts a 1
+				 var end_position = ui.item.index()-1;
+				 var start_position = parseInt(ui.item.find("span.question-order").text())-1;
+				 var test_id = $('#test_id').val();
+				 var question_id = ui.item.find("a.ui-tabs-anchor").attr("href").substr(14);
+				 var error;
+
+				 console.log( "End="+end_position );
+				 console.log( "Start="+start_position );
+				 console.log("testid="+test_id);
+				 console.log("questionid="+question_id);
+
+				 if ( start_position != end_position ) {
+					 $.ajax({
+									type: "POST",
+									url: "/questions/p_reorder/" + test_id,
+									dataType: "json",
+									data: { start_position : start_position, end_position: end_position, question_id: question_id},
+									async: false,
+									success : function(data) {
+										error = data["ERROR"];
+										if (error) {
+											$.each(error, function(index,value){
+												console.log("ERROR: "+value +"\n")
+											});
+											//processError(error);
+										}
+										else {
+											// Change the numeric label for each affected tab.
+											// This value should reflect the current database order
+											$.each(data, function(index,row) {
+												qid = row["question_id"];
+												qorder = Number(row["question_order"])+1; // add 1 to the database value
+												console.log("qid: "+qid+", order: " + qorder);
+												$("#q-"+qid).find("span.question-order").text(qorder+".");
+											});
+										}
+										tabs.tabs("refresh");
+									}
+					});
+				}
+				else
+			 		tabs.tabs( "refresh" );
 			 }
 		 });
 		 tabs.addClass( "ui-tabs-vertical ui-helper-clearfix" );
@@ -21,6 +64,7 @@
 			var label = tabTitle || "Question " + question_id,
 			id = "tab-question-" + question_id,
 			li = $( tabTemplate.replace( /#\{href\}/g, "#" + id )
+				.replace( /#\{qid\}/g, "q-" + question_id)
 				.replace( /#\{label\}/g, label )
 					.replace(/#\{order\}/g, question_order ));
 			//tabContentHtml = tabContent.val() || "Tab " + tabCounter + " content.";
@@ -43,7 +87,7 @@
 			var panelId = $( this ).closest( "li" );
 			dialog.dialog( "open" );
 			if (deleteQuestion)  {
-				panelID.remove().attr( "aria-controls" );
+				panelId.remove().attr( "aria-controls" );
 				$( "#" + panelId ).remove();
 				tabs.tabs( "refresh" );
 			}
@@ -54,7 +98,7 @@
 				var panelId = tabs.find( ".ui-tabs-active" );
 				dialog.dialog( "open" );
 				if (deleteQuestion){
-					panelID.remove().attr( "aria-controls" );
+					panelId.remove().attr( "aria-controls" );
 					$( "#" + panelId ).remove();
 					tabs.tabs( "refresh" );
 				}

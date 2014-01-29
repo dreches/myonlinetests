@@ -206,8 +206,34 @@ class questions_controller extends secure_controller {
             echo json_encode(null);
         }
     } //end of question/p_create
+	
+    public function p_reorder( $test_id )
+	{
+		$_POST = DB::instance(DB_NAME)->sanitize($_POST);
+        $errors = array();
+        $data = ob_get_clean();
+        //check that the variables we need are set
+        if ( empty($test_id) || !is_numeric($test_id) ||
+		    !isset($_POST["start_position"]) || !is_numeric($_POST["start_position"]) ||
+		    !isset($_POST["end_position"]) || !is_numeric($_POST["end_position"]) ||
+			!isset( $_POST["question_id"]) || !is_numeric($_POST["question_id"])){
+            $errors[] = "Invalid arguments for reordering questions. ";
+        }
+        
 
-
+        if (count($errors)>0) {
+			echo json_encode(array("ERROR"=>$errors));
+		} 
+		elseif ( $_POST["start_position"] == $_POST["end_position"] ) {
+			echo json_encode(null);
+		}
+		else {		//no errors - go ahead
+            # Insert this test into the database
+            $affected_tabs = $this->updateQuestionOrder($_POST["start_position"], $_POST["end_position"], $test_id, $_POST["question_id"]);
+			echo json_encode($affected_tabs);
+		}
+	}
+	
     public static function getQuestionTypes() {
         $q = "SELECT question_type_id,question_type_descr FROM question_types";
         return DB::instance(DB_NAME)->select_rows($q);
@@ -222,6 +248,54 @@ class questions_controller extends secure_controller {
         $q = "SELECT MAX(answer_order) + 1 FROM answers WHERE question_id=".$question_id;
         return DB::instance(DB_NAME)->select_field($q);
     }
-
+	
+	private function updateQuestionOrder($start_value, $end_value, $test_id, $start_question_id)
+	{
+		if ($start_value < $end_value) {
+			$q = "SELECT question_id, question_order
+					FROM questions 
+					WHERE test_id = ".$test_id.
+					" AND question_order BETWEEN ".$start_value.
+					" AND ".$end_value;
+			// Get the affected rows in an array
+			$affected_rows = DB::instance(DB_NAME)->select_rows($q);
+			foreach (  $affected_rows AS &$row ) {
+				if ($row["question_id"] != $start_question_id)
+				   $row["question_order"] -= 1;
+				else 
+					$row["question_order"] = $end_value;
+			}
+			unset($row);
+		}						
+		elseif ($start_value > $end_value) {
+			$q = "SELECT question_id, question_order
+					FROM questions 
+					WHERE test_id = ".$test_id.
+					" AND question_order BETWEEN ".$end_value.
+					" AND ".$start_value;
+			// Get the affected rows in an array
+			$affected_rows = DB::instance(DB_NAME)->select_rows($q);
+			foreach (  $affected_rows AS &$row ) {
+				if ($row["question_id"] != $start_question_id)
+				   $row["question_order"] += 1;
+				else 
+					$row["question_order"] = $end_value;
+			}
+			unset($row);
+		}
+			
+		if (!empty($affected_rows)) {
+			
+			// Update the values in the database. Done this way to make a single
+			// transaction for the update and have a record of what changed.
+			// INSERT OR UPDATE counts 2 affected rows  for each updated row.
+			$updated_rows = DB::instance(DB_NAME)->update_or_insert_rows('questions', $affected_rows); 
+			if ( count($affected_rows)*2 == $updated_rows )
+				return $affected_rows;
+			else 
+				return array('ERROR'=>array( "Attempt to update question orders did not complete successfully" ));
+		}
+		return null;
+	}	
 
 } # End of class

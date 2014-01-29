@@ -44,7 +44,7 @@
 	#tab-questions .ui-tabs-nav li.ui-tabs-active, 
 	#tab-questions .ui-tabs-nav li.ui-tabs-active * {background-color: #EBFFD6 !important}
 	
-	span.question-order {float: left;  margin-top: .5em; color: green; font-weight: bold; }
+	span.question-order {float: left;  margin-top: .5em; margin-left: .3em; color: green; font-weight: bold; }
 	#tab-question-edit {border: 2px dotted cyan; 
 						padding-left: 0px; padding-right: 0px;
 						background-color: #EBFFD6;}
@@ -127,8 +127,9 @@
 					<!--List the questions
 					<ul > took out ul tag -->
 						<?php foreach($question_list AS $current_question) { ?>
-							<li><span class="question-order"><?php echo $current_question["question_order"]+1?>.</span>
-							<a href="#tab-question-<?php echo $current_question["question_id"]; ?>">
+							<li id="q-<?php echo $current_question["question_id"]; ?>">
+								<span class="question-order"><?php echo $current_question["question_order"]+1?>.</span>
+								<a href="#tab-question-<?php echo $current_question["question_id"]; ?>">
 									<?php echo siteutils::Truncate($current_question['question_text'], 20,true);//truncate so the text fits in the tab?>
 								</a>
 								<span class="ui-icon ui-icon-close" role="presentation">Remove Tab</span>
