@@ -9,13 +9,13 @@
 			 items: "li:not(#new_question_tab)",  // Adding a new question should always be on top
 			 axis: "y",
 			 stop: function( event, ui) {
-
-				 // Determine where the question moved. Question order starts at 0 in the database, but the
-				 // tab display starts a 1
-				 var end_position = ui.item.index()-1;
+				 // Determine where the question ended by looking at it's index in the context of all question
+				 // tabs
+				 var end_position = $("li[id^=q-]").index(ui.item);
+				 // Subtract one because in the database the count starts from 0, not 1
 				 var start_position = parseInt(ui.item.find("span.question-order").text())-1;
 				 var test_id = $('#test_id').val();
-				 var question_id = ui.item.find("a.ui-tabs-anchor").attr("href").substr(14);
+				 var question_id = ui.item.attr("id").substr(2);
 				 var error;
 
 				 console.log( "End="+end_position );
@@ -54,7 +54,7 @@
 				}
 				else
 			 		tabs.tabs( "refresh" );
-			 }
+			 } // stop()
 		 });
 		 tabs.addClass( "ui-tabs-vertical ui-helper-clearfix" );
 		 tabs.find("[role=tab]").removeClass( "ui-corner-top" ).addClass( "ui-corner-right" );
