@@ -20,7 +20,7 @@
     .ui-tabs-vertical .ui-tabs-nav li { clear: right; 
 										width: 100%;
 										font-size: 90%;
-										border: groove grey;
+										border: ridge grey;
 										border-width: 2px 4px 2px 0px !important ;
 										border-width-left: 0px !important;
 										padding-left: 0px; 
@@ -57,9 +57,10 @@
 					width: 100%;
 					background-color: #EBFFD6 !important}
 	#tab-questions li .ui-icon-close { float: right; margin: 0.4em 0.2em 0 0; cursor: pointer; }
-	#new_question_tab { font-weight: bold; font-style: italic; }
+	#new-question-tab { font-weight: bold; font-style: italic; }
 	#tab-question-new fieldset { border-width: 0px;}
 	#tab-question-new fieldset legend{ font-weight: bold}
+	#cmdAddQuestion{ padding-top: .5em; padding-bottom: .5em;  margin-top: 1em; }
 </style>
 
 
@@ -122,12 +123,13 @@
 					<ul> <!-- Moved the list up here -->
 					<?php if ($editable) {?>
 					
-						<li id="new_question_tab"><a href="#tab-question-new">Add a new question</a></li>									
+						<li id="new-question-tab"><a href="#tab-question-new">Add a new question</a></li>									
 					<?php }?>
 					<!--List the questions
 					<ul > took out ul tag -->
 						<?php foreach($question_list AS $current_question) { ?>
 							<li id="q-<?php echo $current_question["question_id"]; ?>">
+								<!-- question_order field starts from 0 so need to add 1 -->
 								<span class="question-order"><?php echo $current_question["question_order"]+1?>.</span>
 								<a href="#tab-question-<?php echo $current_question["question_id"]; ?>">
 									<?php echo siteutils::Truncate($current_question['question_text'], 20,true);//truncate so the text fits in the tab?>
@@ -153,7 +155,7 @@
 									</p>
 								<?php } ?>
 								<input type='hidden' name='test_id' id='test_id' value='<?php echo $test_id;?>'/>
-								<input type='button' value='Add Question' id='cmdAddQuestion'>
+								<input type='button' value='Add New Question' id='cmdAddQuestion'>
 							</fieldset>
 						</div>
 					<?php } ?>

@@ -39,14 +39,14 @@
 </p>
 <!--List of tests to follow-->
 <div id="existing-tests-div">
-
-<?php foreach($test_list AS $current_test) { ?>
-    <div>
-        <a href="/tests/edit/<?php echo $current_test['test_id'] ?>">
-            <?php echo $current_test['test_name']?>
-        </a>
-        - <?php echo $current_test['test_descr']?>
-    </div>
+	<ol>
+	<?php foreach($test_list AS $current_test) { ?>
+		<li>
+			<a href="/tests/edit/<?php echo $current_test['test_id'] ?>">
+				<?php echo $current_test['test_name']?>
+			</a>
+			- <?php echo $current_test['test_descr']?>
+		</li>
+	<?php } ?>
+	</ol>
 </div>
-
-<?php } ?>
