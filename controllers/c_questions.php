@@ -77,6 +77,69 @@ class questions_controller extends secure_controller {
 
         echo json_encode($question);
     }
+	
+	public function p_add_question_image( $question_id ) {
+		# Check if an image was actually loaded
+		$key = key($_FILES);
+		$f_error = $_FILES[$key]['error'];
+		$filename = $_FILES[$key]['name'];
+		#$errstr = '';
+		if ( $f_error>0) {
+			#echo "error value: $f_error";
+			# if a file was specified, but not loaded, report an error so user can retry 
+			if ($f_error <> 4) {
+				$error = true;
+				$errstr .= "Error attempting to upload $filename: ";
+				switch ($f_error) {
+					case 1:
+					case 2: 
+						$errstr .= "File size was too large. <br>";
+						break;
+					case 3:
+						$errstr .= "File only partially uploaded<br>";
+						break;
+					default:
+						$errstr .= "Error code: $f_error.<br>";
+				}
+				# Set up the View
+				$this->template->content = View::instance('v_users_profile');
+				$this->template->title = "DocTalk: Profile";
+			    $this->template->content->error = $errstr;
+				$this->template->content->user_name = $this->user->first_name.' '.$this->user->last_name;
+				echo $this->template;
+			}
+			else
+			{
+				$errstr .= "No file was specified for upload. Press Skip button to leave the page.<br>";
+			}
+			
+		}
+		
+		
+		# At this point, either no file was specified, in which case proceed, or a file was uploaded to a temp directory.
+		if (!$error) {
+			if (!empty($filename))
+			{
+				# Give the file a unique name by incorporating the user_id.
+				$new_name = "image".$question_id;
+				$new_name = Upload::upload($_FILES,QIMAGE_PATH,array("jpg","JPG","jpeg","JPEG","gif","GIF","png","PNG"),$new_name);
+				if ($new_name === "Invalid file type.") {
+					#echo "Invalid file type";
+					$errstr .= "Invalid file type for $filename.<br>";
+					$error = true;
+				}
+				else {
+					# Put the avatar in $_POST 
+					#echo ($new_name);
+					$_POST["avatar"]= $new_name;
+				}
+			}
+			else
+			{
+				$errstr .= "No file uploaded.";
+			}
+		}
+	}
 
     //add a new answer for a question
     public function p_addanswer($question_id) {
@@ -220,7 +283,6 @@ class questions_controller extends secure_controller {
             $errors[] = "Invalid arguments for reordering questions. ";
         }
         
-
         if (count($errors)>0) {
 			echo json_encode(array("ERROR"=>$errors));
 		} 
@@ -231,6 +293,38 @@ class questions_controller extends secure_controller {
             # Insert this test into the database
             $affected_tabs = $this->updateQuestionOrder($_POST["start_position"], $_POST["end_position"], $test_id, $_POST["question_id"]);
 			echo json_encode($affected_tabs);
+		}
+	}
+	
+	/* Potential new functionality */
+	public function p_delete_question( $test_id )
+	{
+		$_POST = DB::instance(DB_NAME)->sanitize($_POST);
+        $errors = array();
+        $data = ob_get_clean();
+        //check that the variables we need are set
+        if ( empty($test_id) || !is_numeric($test_id) ||
+			!isset( $_POST["question_id"]) || !is_numeric($_POST["question_id"])){
+            $errors[] = "Invalid arguments for delete question. ";
+		}
+		else {
+			// Make sure the question is actually associated with this test. 
+			
+			$q= "SELECT question_order FROM questions WHERE test_id = ".$test_id.
+				" AND question_id = ".$question_id;
+			$deleted_question_order = DB::instance(DB_NAME)->select_field($q);
+			
+			// If row was successful, then 
+			if ($deleted_question_order) {
+				// TODO: Delete or update
+				$q = "UPDATE questions 
+				      SET question_order = question_order-1 
+					  WHERE test_id = ". $test_id .
+					  "AND question_order > ".$deleted_question_order;
+					  
+				$affected_rows = DB::instance(DB_NAME)->query($q);
+				
+			}
 		}
 	}
 	
@@ -259,11 +353,14 @@ class questions_controller extends secure_controller {
 					" AND ".$end_value;
 			// Get the affected rows in an array
 			$affected_rows = DB::instance(DB_NAME)->select_rows($q);
+			var found_question = false;
 			foreach (  $affected_rows AS &$row ) {
 				if ($row["question_id"] != $start_question_id)
 				   $row["question_order"] -= 1;
-				else 
+				else {
+					found_question = true;
 					$row["question_order"] = $end_value;
+				}
 			}
 			unset($row);
 		}						
@@ -278,11 +375,15 @@ class questions_controller extends secure_controller {
 			foreach (  $affected_rows AS &$row ) {
 				if ($row["question_id"] != $start_question_id)
 				   $row["question_order"] += 1;
-				else 
+				else {
+					found_question = true;
 					$row["question_order"] = $end_value;
+				}
 			}
 			unset($row);
 		}
+		if (!found_question) { // The question was not associated with this test
+			return  array('ERROR'=>array( "Invalid attempt to reorder question not associated with this test." ));
 			
 		if (!empty($affected_rows)) {
 			

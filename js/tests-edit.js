@@ -27,6 +27,7 @@ $(document).ready(function()   {
 			 // tabs
 			 var end_position = $("li[id^=q-]").index(ui.item);
 			 // Subtract one because in the database the count starts from 0, not 1
+			 // (or maybe only get the start position from the database?)
 			 var start_position = parseInt(ui.item.find("span.question-order").text())-1;
 			 var test_id = $('#test_id').val();
 			 var question_id = ui.item.attr("id").substr(2);
@@ -50,7 +51,7 @@ $(document).ready(function()   {
 								$.each(error, function(index,value){
 									console.log("ERROR: "+value +"\n")
 								});
-								//processError(error);
+								//TODO: processError(error);
 							}
 							else {
 								// Change the numeric label for each affected tab.
@@ -64,7 +65,7 @@ $(document).ready(function()   {
 							}
 							tabs.tabs("refresh");
 						}
-				});
+				}); //end ajax
 			}
 			else
 				tabs.tabs( "refresh" );
@@ -72,7 +73,7 @@ $(document).ready(function()   {
  	});
 
 	/****************************************************
-	Code for adding a new tab (question)
+	Code for adding a new question /tab
 	*****************************************************/
 
 	var tabTemplate = "<li id='#{qid}'><span class='question-order'>#{order}.</span>" +
@@ -163,6 +164,36 @@ $(document).ready(function()   {
 
 	var deleteQuestion = false;
 
+	function deleteQuestion (question_id) {
+		$.ajax({
+				type: "POST",
+				url: "/questions/p_delete_question/" + $('#test_id').val(),
+				dataType: "json",
+				data: {question_id: question_id},
+				async: false,
+				success : function(data) {
+					error = data["ERROR"];
+					if (error) {
+						$.each(error, function(index,value){
+							console.log("ERROR: "+value +"\n")
+						});
+						//TODO: processError(error);
+					}
+					else {
+						// Change the numeric label for each affected tab.
+						// This value should reflect the current database order
+						$.each(data, function(index,row) {
+							qid = row["question_id"];
+							qorder = Number(row["question_order"])+1; // add 1 to the database value
+							console.log("qid: "+qid+", order: " + qorder);
+							$("#q-"+qid).find("span.question-order").text(qorder+".");
+						});
+					}
+					tabs.tabs("refresh");
+								}
+				}); //end ajax
+	}
+
 	// close icon: removing the tab on click
 	tabs.delegate( "span.ui-icon-close", "click", function() {
 		// Find the tab that was clicked on and select it
@@ -171,7 +202,7 @@ $(document).ready(function()   {
 		// Show a dialog box asking if this should be removed
 		dialog.dialog( "open" );
 		if (deleteQuestion)  {
-			// Delete the question from the database
+			// TODO: Delete the question from the database
 			var panelId = tabToRemove.remove().attr( "aria-controls" );
 			$( "#" + panelId ).remove();
 			deleteQuestion = false;
@@ -184,7 +215,7 @@ $(document).ready(function()   {
 			var tabToRemove = tabs.find( ".ui-tabs-active" );
 			dialog.dialog( "open" );
 			if (deleteQuestion){
-				// Delete the question from the database first
+				// TODO: Delete the question from the database first
 				var panelId = tabToRemove.remove().attr( "aria-controls" );
 				$( "#" + panelId ).remove();
 				deleteQuestion = false;

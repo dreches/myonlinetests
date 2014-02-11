@@ -61,6 +61,7 @@
 	#tab-question-new fieldset { border-width: 0px;}
 	#tab-question-new fieldset legend{ font-weight: bold}
 	#cmdAddQuestion{ padding-top: .5em; padding-bottom: .5em;  margin-top: 1em; }
+	span.instructions { display: block; font-size: 90%; color: #CC0000;}
 </style>
 
 
