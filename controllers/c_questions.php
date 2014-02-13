@@ -302,28 +302,50 @@ class questions_controller extends secure_controller {
 		$_POST = DB::instance(DB_NAME)->sanitize($_POST);
         $errors = array();
         $data = ob_get_clean();
+		$affected_questions = array();
         //check that the variables we need are set
         if ( empty($test_id) || !is_numeric($test_id) ||
-			!isset( $_POST["question_id"]) || !is_numeric($_POST["question_id"])){
+			!isset( $_POST["question_id"]) || !is_numeric($_POST["question_id"]) ||
+			!isset( $_POST["question_order"]) || !is_numeric($_POST["question_order"])){
             $errors[] = "Invalid arguments for delete question. ";
+			echo json_encode(array("ERROR"=>$errors));
 		}
 		else {
 			// Make sure the question is actually associated with this test. 
-			
+			$question_id = $_POST["question_id"];
+			$deleted_question_order = $_POST["question_order"];
+			$q= "SELECT question_id, question_order FROM questions WHERE test_id = ".$test_id.
+				" AND question_order >= ".$deleted_question_order;
+			$affected_questions = DB::instance(DB_NAME)->select_kv($q, 'question_id', 'question_order');
+			/*
 			$q= "SELECT question_order FROM questions WHERE test_id = ".$test_id.
 				" AND question_id = ".$question_id;
-			$deleted_question_order = DB::instance(DB_NAME)->select_field($q);
+			$deleted_question_order = DB::instance(DB_NAME)->select_field($q); */
 			
-			// If row was successful, then 
-			if ($deleted_question_order) {
-				// TODO: Delete or update
-				$q = "UPDATE questions 
+			// If the input data was accurate, procede to delete
+			if ( $affected_questions[$question_id] == $deleted_question_order )
+			{	
+				// TODO: Delete or mark as deleted the question from the database
+				DB::instance(DB_NAME)->delete('questions',"WHERE question_id = ".$question_id);
+				// remove the deleted question from the array
+				unset($affected_questions[$question_id]);
+				
+				$u = "UPDATE questions 
 				      SET question_order = question_order-1 
 					  WHERE test_id = ". $test_id .
-					  "AND question_order > ".$deleted_question_order;
-					  
-				$affected_rows = DB::instance(DB_NAME)->query($q);
+					  " AND question_order > ".$deleted_question_order;
 				
+				DB::instance(DB_NAME)->query($u);
+				$affected_rows = DB::instance(DB_NAME)->connection->affected_rows;
+				
+				if ( count($affected_questions) == $affected_rows )
+					echo json_encode( array('ROWS'=>$affected_questions));
+				else {
+					// We don't know what happened, so reselect the rows (using $q and return)
+					$affected_questions = DB::instance(DB_NAME)->select_kv($q, 'question_id', 'question_order');
+					echo json_encode( array('ERROR'=>array( "Attempt to delete question ".$deleted_question_order." did not complete successfully. Please refresh",
+					'ROWS'=>$affected_questions	)));
+				}
 			}
 		}
 	}
@@ -353,12 +375,12 @@ class questions_controller extends secure_controller {
 					" AND ".$end_value;
 			// Get the affected rows in an array
 			$affected_rows = DB::instance(DB_NAME)->select_rows($q);
-			var found_question = false;
+			$found_question = false;
 			foreach (  $affected_rows AS &$row ) {
 				if ($row["question_id"] != $start_question_id)
 				   $row["question_order"] -= 1;
 				else {
-					found_question = true;
+					$found_question = true;
 					$row["question_order"] = $end_value;
 				}
 			}
@@ -376,15 +398,15 @@ class questions_controller extends secure_controller {
 				if ($row["question_id"] != $start_question_id)
 				   $row["question_order"] += 1;
 				else {
-					found_question = true;
+					$found_question = true;
 					$row["question_order"] = $end_value;
 				}
 			}
 			unset($row);
 		}
-		if (!found_question) { // The question was not associated with this test
+		if (!$found_question) { // The question was not associated with this test
 			return  array('ERROR'=>array( "Invalid attempt to reorder question not associated with this test." ));
-			
+		}	
 		if (!empty($affected_rows)) {
 			
 			// Update the values in the database. Done this way to make a single
@@ -392,9 +414,12 @@ class questions_controller extends secure_controller {
 			// INSERT OR UPDATE counts 2 affected rows  for each updated row.
 			$updated_rows = DB::instance(DB_NAME)->update_or_insert_rows('questions', $affected_rows); 
 			if ( count($affected_rows)*2 == $updated_rows )
-				return $affected_rows;
-			else 
-				return array('ERROR'=>array( "Attempt to update question orders did not complete successfully" ));
+				return  array('ROWS'=>$affected_rows);
+			else
+				// Get the current order of the rows we attempted to update
+				$affected_rows = DB::instance(DB_NAME)->select_rows($q);
+				return array('ERROR'=>array( "Attempt to update question orders did not complete successfully" ),
+				'ROWS'=>$affected_rows);
 		}
 		return null;
 	}	

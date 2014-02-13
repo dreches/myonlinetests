@@ -47,16 +47,18 @@ $(document).ready(function()   {
 						async: false,
 						success : function(data) {
 							error = data["ERROR"];
+							updatedRows = data["ROWS"];
 							if (error) {
 								$.each(error, function(index,value){
 									console.log("ERROR: "+value +"\n")
 								});
 								//TODO: processError(error);
 							}
-							else {
+							if (updatedRows)
+							{
 								// Change the numeric label for each affected tab.
 								// This value should reflect the current database order
-								$.each(data, function(index,row) {
+								$.each(updatedRows, function(index,row) {
 									qid = row["question_id"];
 									qorder = Number(row["question_order"])+1; // add 1 to the database value
 									console.log("qid: "+qid+", order: " + qorder);
@@ -116,7 +118,7 @@ $(document).ready(function()   {
 				return;
 			}
 
-			// If question text not unique
+			// TODO:? See If question text not unique
 
 			$.ajax({
 				type: "POST",
@@ -162,86 +164,94 @@ $(document).ready(function()   {
 	Code for deleting a tab (question)
 	*************************************/
 
-	var deleteQuestion = false;
+
+	// modal dialog init: custom buttons and a "close" callback resetting the form inside
+	var confirmDialog = $( "#dialog-confirm" ).dialog({
+		autoOpen: false,
+		modal: true,
+		buttons: {
+			Delete: function() {
+				var tabToRemove = $("li.remove_tab");
+				var question_id = tabToRemove.attr("id").substr(2);
+				console.log( "Question id#: " + question_id );
+
+				// Delete the question from the database
+				deleteQuestion( question_id );
+				console.log("Deleted question");
+				var panelId = tabToRemove.remove().attr( "aria-controls" );
+				$( "#" + panelId ).remove();
+				tabs.tabs( "refresh" );
+				$( this ).dialog( "close" );
+			},
+			Cancel: function() {
+				$(".remove_tab").removeClass("remove_tab");
+				console.log( this );
+				$( this ).dialog( "close" );
+			}
+		}
+	});
 
 	function deleteQuestion (question_id) {
+		// Send the question order to the server.
+		var question_order = parseInt($("#q-"+question_id).find("span.question-order").text())-1;
 		$.ajax({
 				type: "POST",
 				url: "/questions/p_delete_question/" + $('#test_id').val(),
 				dataType: "json",
-				data: {question_id: question_id},
+				data: {question_id: question_id, question_order: question_order},
 				async: false,
 				success : function(data) {
 					error = data["ERROR"];
+					updatedRows = data["ROWS"];
 					if (error) {
 						$.each(error, function(index,value){
 							console.log("ERROR: "+value +"\n")
 						});
 						//TODO: processError(error);
 					}
-					else {
+					if (updatedRows) {
+
 						// Change the numeric label for each affected tab.
 						// This value should reflect the current database order
-						$.each(data, function(index,row) {
-							qid = row["question_id"];
-							qorder = Number(row["question_order"])+1; // add 1 to the database value
+						// The data is sent back as an array where question_id is the key and
+						// question_order is the value
+						$.each(updatedRows, function(qid,qorder) {
+
+							// If there was an error we are getting the values in the database,
+							// Otherwise, if there was no error, we are using the predelete question_order value,
+							// which should reflect the correct number after deletion.
+							if (error) qorder = Number(qorder)+1; // add 1 to the database value
 							console.log("qid: "+qid+", order: " + qorder);
 							$("#q-"+qid).find("span.question-order").text(qorder+".");
-						});
-					}
-					tabs.tabs("refresh");
-								}
-				}); //end ajax
+						}); //end $.each
+					} // end if (updatedRows)
+
+					//tabs.tabs("refresh");
+				} //end success
+			}); //end ajax
 	}
 
 	// close icon: removing the tab on click
 	tabs.delegate( "span.ui-icon-close", "click", function() {
 		// Find the tab that was clicked on and select it
 		var tabToRemove = $( this ).closest( "li" );
+		tabToRemove.addClass("remove_tab");
 		tabs.tabs("option","active",tabToRemove.index());
 		// Show a dialog box asking if this should be removed
-		dialog.dialog( "open" );
-		if (deleteQuestion)  {
-			// TODO: Delete the question from the database
-			var panelId = tabToRemove.remove().attr( "aria-controls" );
-			$( "#" + panelId ).remove();
-			deleteQuestion = false;
-			tabs.tabs( "refresh" );
-		}
+		confirmDialog.dialog( "open" );
+
+
 	});
 
 	tabs.bind( "keyup", function( event ) {
 		if ( event.altKey && event.keyCode === $.ui.keyCode.BACKSPACE ) {
 			var tabToRemove = tabs.find( ".ui-tabs-active" );
-			dialog.dialog( "open" );
-			if (deleteQuestion){
-				// TODO: Delete the question from the database first
-				var panelId = tabToRemove.remove().attr( "aria-controls" );
-				$( "#" + panelId ).remove();
-				deleteQuestion = false;
-				tabs.tabs( "refresh" );
-			}
+			tabToRemove.addClass("remove_tab");
+			confirmDialog.dialog( "open" );
 		}
 	});
 
 
-	// modal dialog init: custom buttons and a "close" callback resetting the form inside
-	var dialog = $( "#dialog-confirm" ).dialog({
-		autoOpen: false,
-		modal: true,
-		buttons: {
-			Delete: function() {
-				deleteQuestion = true;
-				console.log( this );
-				$( this ).dialog( "close" );
-			},
-			Cancel: function() {
-				deleteQuestion = false;
-				console.log( this );
-				$( this ).dialog( "close" );
-			}
-		}
-	});
 
 	/*******************************************
 	Functions for Assigning tests
